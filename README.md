@@ -29,7 +29,7 @@ docker-compose up
 
 ```
 docs/spec/     仕様書(kiro式)。機能ごとに requirements / design / tasks の3点セット
-front/         フロントエンド (React + Vite + TypeScript)
+front/         フロントエンド (React + Vite + TypeScript + Tailwind CSS)
 backend/       バックエンド (FastAPI。routers → services → repositories の3層)
 infra/         インフラ定義(IaC。デプロイ先決定後に追加)
 CLAUDE.md      コーディング制約(AI エージェント・人間共通のルール)

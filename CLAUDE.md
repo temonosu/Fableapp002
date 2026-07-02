@@ -33,6 +33,7 @@ Makefile       開発コマンド集約 (make test / make lint など)
 - TypeScript strict モードを維持する。`any` の使用は禁止(ESLint でエラー)
 - コンポーネントは関数コンポーネント + hooks で書く
 - スマートフォンファースト: 375px 幅を基準にレイアウトし、タッチ操作(44px以上のタップ領域)を前提にする
+- スタイリングは Tailwind CSS のユーティリティクラスで書く。全画面共通のベーススタイルのみ `src/styles/global.css` に置き、コンポーネント個別の CSS ファイルは作らない
 - API 通信は `src/api/` に集約し、コンポーネントから直接 fetch しない(`src/api/client.ts` の `apiGet` 等を使う)
 - Lint/Format: ESLint + Prettier に従う(CI で検査)
 

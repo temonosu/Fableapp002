@@ -12,18 +12,22 @@ export function HomePage() {
   }, []);
 
   return (
-    <main>
-      <h1>myapp</h1>
-      <p>スマートフォン向け Web アプリのテンプレートです。</p>
-      <section aria-label="バックエンド疎通確認">
-        <h2>API ステータス</h2>
+    <main className="mx-auto max-w-[640px] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <h1 className="text-2xl font-bold">myapp</h1>
+      <p className="mt-2">スマートフォン向け Web アプリのテンプレートです。</p>
+      <section aria-label="バックエンド疎通確認" className="mt-6">
+        <h2 className="text-lg font-semibold">API ステータス</h2>
         {health && (
-          <p>
+          <p className="mt-1">
             API: {health.status} / DB: {health.database}
           </p>
         )}
-        {error && <p role="alert">API に接続できません: {error}</p>}
-        {!health && !error && <p>確認中...</p>}
+        {error && (
+          <p role="alert" className="mt-1 text-red-700">
+            API に接続できません: {error}
+          </p>
+        )}
+        {!health && !error && <p className="mt-1 text-neutral-500">確認中...</p>}
       </section>
     </main>
   );

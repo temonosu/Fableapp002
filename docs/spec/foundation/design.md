@@ -25,6 +25,7 @@
 | ビルド | Vite |
 | 言語 | TypeScript (strict) |
 | ルーティング | React Router |
+| スタイリング | Tailwind CSS v4(`@tailwindcss/vite` プラグイン) |
 | 状態管理 | まずは React 標準 (useState/Context)。必要になったら再検討 |
 | テスト | Vitest |
 | Lint/Format | ESLint (flat config) + Prettier |
@@ -38,7 +39,7 @@ front/
 │   ├── components/   # 再利用コンポーネント(必要になったら作成)
 │   ├── pages/        # 画面単位のコンポーネント
 │   ├── hooks/        # カスタムフック(必要になったら作成)
-│   ├── styles/       # グローバル CSS
+│   ├── styles/       # グローバル CSS(Tailwind の読み込みとベーススタイルのみ)
 │   └── main.tsx
 ├── Dockerfile
 └── package.json
@@ -47,7 +48,8 @@ front/
 ### モバイル対応方針
 
 - viewport meta 設定(`viewport-fit=cover` で iOS セーフエリア対応)、375px 基準のモバイルファースト CSS
-- タップ領域 44px 以上、`touch-action: manipulation` の指定
+- スタイリングは Tailwind のユーティリティクラスで行う。全画面共通のベーススタイル
+  (フォント、タップ領域 44px 以上、`touch-action: manipulation`)のみ `styles/global.css` に置く
 - 将来的な PWA 化(manifest + service worker)を想定した構成にする
 
 ## 3. バックエンド設計 (backend/)
