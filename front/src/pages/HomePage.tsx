@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { fetchHealth, type HealthResponse } from "../api/health";
 
 export function HomePage() {
@@ -15,6 +16,12 @@ export function HomePage() {
     <main className="mx-auto max-w-[640px] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
       <h1 className="text-2xl font-bold">myapp</h1>
       <p className="mt-2">スマートフォン向け Web アプリのテンプレートです。</p>
+      <Link
+        to="/match"
+        className="mt-4 block rounded bg-rose-700 py-3 text-center font-bold text-white active:bg-rose-800"
+      >
+        賭場へ(こいこい対AI戦)
+      </Link>
       <section aria-label="バックエンド疎通確認" className="mt-6">
         <h2 className="text-lg font-semibold">API ステータス</h2>
         {health && (
