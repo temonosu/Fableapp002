@@ -1,0 +1,22 @@
+# 環境変数
+.env
+.env.local
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store

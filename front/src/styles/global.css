@@ -1,0 +1,35 @@
+/* モバイルファースト: 375px 基準。タップ領域は 44px 以上を確保する */
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    "Hiragino Sans",
+    "Noto Sans JP",
+    sans-serif;
+  line-height: 1.6;
+  color: #1a1a1a;
+  background: #fafafa;
+}
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px;
+  /* iOS のセーフエリア対応 */
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+button {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+}
