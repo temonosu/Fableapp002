@@ -58,6 +58,7 @@ front/
 |------|------|
 | フレームワーク | FastAPI |
 | 言語 | Python 3.11+ |
+| パッケージ管理 | uv(`uv sync` + `uv.lock` で依存を固定) |
 | ORM | SQLAlchemy 2.x |
 | マイグレーション | Alembic |
 | バリデーション | Pydantic v2 |

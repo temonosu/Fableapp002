@@ -1,4 +1,4 @@
-# インストール: pip install pre-commit && pre-commit install
+# インストール: uv tool install pre-commit && pre-commit install
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0

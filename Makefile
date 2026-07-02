@@ -11,7 +11,7 @@ front-install:
 	cd front && npm install
 
 backend-install:
-	cd backend && pip install -e ".[dev]"
+	cd backend && uv sync
 
 # --- 開発 ---
 
@@ -29,7 +29,7 @@ front-test:
 	cd front && npm test
 
 backend-test:
-	cd backend && python -m pytest
+	cd backend && uv run pytest
 
 lint: front-lint backend-lint ## 全 Lint を実行
 
@@ -37,16 +37,16 @@ front-lint:
 	cd front && npm run lint && npm run format:check && npx tsc -b
 
 backend-lint:
-	cd backend && python -m ruff check . && python -m ruff format --check . && python -m mypy
+	cd backend && uv run ruff check . && uv run ruff format --check . && uv run mypy
 
 format: ## コードを自動整形
 	cd front && npm run format
-	cd backend && python -m ruff format . && python -m ruff check --fix .
+	cd backend && uv run ruff format . && uv run ruff check --fix .
 
 # --- DB ---
 
 migrate: ## マイグレーションを適用
-	cd backend && alembic upgrade head
+	cd backend && uv run alembic upgrade head
 
 migration: ## マイグレーションを自動生成 (make migration m="add users table")
-	cd backend && alembic revision --autogenerate -m "$(m)"
+	cd backend && uv run alembic revision --autogenerate -m "$(m)"
