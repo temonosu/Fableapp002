@@ -29,7 +29,7 @@ docker-compose up
 
 ```
 docs/spec/     仕様書(kiro式)。機能ごとに requirements / design / tasks の3点セット
-front/         フロントエンド (React + Vite + TypeScript)
+front/         フロントエンド (React + Vite + TypeScript + Tailwind CSS)
 backend/       バックエンド (FastAPI。routers → services → repositories の3層)
 infra/         インフラ定義(IaC。デプロイ先決定後に追加)
 CLAUDE.md      コーディング制約(AI エージェント・人間共通のルール)
@@ -37,7 +37,7 @@ CLAUDE.md      コーディング制約(AI エージェント・人間共通の�
 
 ## 開発コマンド
 
-Docker を使わずローカルで開発する場合(Node 22+ / Python 3.11+):
+Docker を使わずローカルで開発する場合(Node 22+ / [uv](https://docs.astral.sh/uv/)):
 
 ```bash
 make setup    # 依存のインストール + .env 作成
@@ -57,7 +57,7 @@ make migrate  # DB マイグレーション適用
 ## テンプレートに含まれるもの
 
 - front / backend の動く骨組み(ヘルスチェックで疎通確認済みの状態)
-- Docker Compose 開発環境、Alembic マイグレーション基盤
+- Docker Compose 開発環境、Alembic マイグレーション基盤、uv による依存管理(`uv.lock`)
 - CI(GitHub Actions: lint + test)、PR テンプレート
 - ESLint / Prettier / ruff / mypy / pre-commit の設定
 - spec 雛形(docs/spec/_template/)

@@ -1,35 +1,20 @@
-/* モバイルファースト: 375px 基準。タップ領域は 44px 以上を確保する */
-* {
-  box-sizing: border-box;
-  margin: 0;
+/* モバイルファースト: 375px 基準。個別のスタイルは Tailwind のユーティリティクラスで書き、
+   ここには全画面共通のベーススタイルだけを置く */
+@import "tailwindcss";
+
+@theme {
+  --font-sans: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
+@layer base {
+  body {
+    @apply bg-neutral-50 font-sans leading-relaxed text-neutral-900;
+  }
 
-body {
-  font-family:
-    system-ui,
-    -apple-system,
-    "Hiragino Sans",
-    "Noto Sans JP",
-    sans-serif;
-  line-height: 1.6;
-  color: #1a1a1a;
-  background: #fafafa;
-}
-
-main {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 16px;
-  /* iOS のセーフエリア対応 */
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
-}
-
-button {
-  min-height: 44px;
-  min-width: 44px;
-  touch-action: manipulation;
+  /* タップ領域は 44px 以上を確保する */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
 }

@@ -1,6 +1,6 @@
 # front
 
-フロントエンド (React + Vite + TypeScript)。
+フロントエンド (React + Vite + TypeScript + Tailwind CSS)。
 
 ```bash
 npm install
