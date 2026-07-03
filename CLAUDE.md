@@ -35,6 +35,9 @@ Makefile       開発コマンド集約 (make test / make lint など)
 - スマートフォンファースト: 375px 幅を基準にレイアウトし、タッチ操作(44px以上のタップ領域)を前提にする
 - スタイリングは Tailwind CSS のユーティリティクラスで書く。全画面共通のベーススタイルのみ `src/styles/global.css` に置き、コンポーネント個別の CSS ファイルは作らない
 - API 通信は `src/api/` に集約し、コンポーネントから直接 fetch しない(`src/api/client.ts` の `apiGet` 等を使う)
+- ゲームロジックは `src/game/`(対局)と `src/run/`(ラン)に置き、React・通信に依存させない。
+  状態変化は必ずアクション適用(reducer)経由とし、決定論(シード+操作列で完全再現)を壊さない。
+  乱数は `src/game/rng.ts` のシード付き乱数のみ使い、`Math.random` を使わない
 - Lint/Format: ESLint + Prettier に従う(CI で検査)
 
 ## バックエンド (backend/)
