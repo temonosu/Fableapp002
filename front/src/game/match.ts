@@ -50,6 +50,7 @@ export function createTable(
     roundNumber: 1,
     round: null,
     result: null,
+    heat: config.kubikake !== null ? 30 : 0, // 首賭け宣言は場が沸く
   };
   return dealRound(base);
 }
@@ -109,6 +110,7 @@ function fireEffects(
     const multiplierDelta = outcome.multiplierDelta ?? 0;
     draft.chips[owner] = Math.max(0, draft.chips[owner] + chipDelta);
     round.multiplier += multiplierDelta;
+    draft.heat += 5; // 細工の発動は場が沸く
     events.push({ type: "effect", effect: effectId, player: owner, chipDelta, multiplierDelta });
   }
 }
@@ -234,6 +236,16 @@ function settleRound(
   draft.chips[loser] -= transfer;
   draft.chips[winner] += transfer;
 
+  // 大入り: 熱気100以上で上がった者におひねり(場からの湧き出し)。要件 roguelike-run 4-2
+  const ooiriBonus = draft.heat >= 100 ? entryFee * 3 : 0;
+  if (ooiriBonus > 0) {
+    draft.chips[winner] += ooiriBonus;
+    draft.heat = 0;
+  }
+  // 派手な上がりは場を沸かせる(次の大入りへの積み上げ)
+  if (multiplier >= 3) draft.heat += 10 * multiplier;
+  if (shunCount === 4) draft.heat += 10;
+
   const settlement: Settlement = {
     winner,
     base,
@@ -244,6 +256,7 @@ function settleRound(
     kubikakeDoubled,
     gross,
     transfer,
+    ooiriBonus,
   };
   events.push({ type: "roundEnd", settlement });
 
@@ -326,6 +339,7 @@ export function applyAction(state: TableState, action: Action): ApplyResult {
       round.koikoiCount[action.player] += 1;
       round.multiplier += 1;
       round.yakuBase[action.player] = totalPoints(round.captured[action.player]);
+      draft.heat += 15;
       events.push({ type: "koikoi", player: action.player, multiplier: round.multiplier });
       passTurn(draft, round, events);
       return { ok: true, state: draft, events };
@@ -342,6 +356,7 @@ export function applyAction(state: TableState, action: Action): ApplyResult {
       if (round.phase !== "roundOver") return fail("局が終わっていない");
       if (draft.result !== null) return fail("賭場戦は終了している");
       draft.roundNumber += 1;
+      draft.heat = Math.max(0, draft.heat - 20); // 局をまたぐと熱気は冷める
       const next = dealRound(draft);
       return { ok: true, state: next.state, events: next.events };
     }
