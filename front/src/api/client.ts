@@ -36,7 +36,13 @@ export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
   return (await response.json()) as T;
 }
 
-/** WebSocket 用の URL(http(s) → ws(s) に読み替え) */
+/** WebSocket 用の URL(http(s) → ws(s) に読み替え。同一オリジン配信の相対パスにも対応) */
 export function buildWsUrl(path: string): string {
-  return buildUrl(path).replace(/^http/, "ws");
+  const url = buildUrl(path);
+  if (url.startsWith("http")) {
+    return url.replace(/^http/, "ws");
+  }
+  // VITE_API_BASE_URL="" のとき buildUrl は相対パスを返すので、現在のオリジンから組み立てる
+  const scheme = window.location.protocol === "https:" ? "wss:" : "ws:";
+  return `${scheme}//${window.location.host}${url}`;
 }

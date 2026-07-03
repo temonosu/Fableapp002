@@ -1,6 +1,6 @@
 # 開発でよく使うコマンド。CLAUDE.md からも参照される
 .PHONY: setup dev down test lint format front-install backend-install \
-        front-test backend-test front-lint backend-lint migrate migration
+        front-test backend-test front-lint backend-lint migrate migration deploy
 
 # --- セットアップ ---
 
@@ -50,3 +50,8 @@ migrate: ## マイグレーションを適用
 
 migration: ## マイグレーションを自動生成 (make migration m="add users table")
 	cd backend && uv run alembic revision --autogenerate -m "$(m)"
+
+# --- デプロイ ---
+
+deploy: ## Cloud Run へデプロイ (make deploy project=<PROJECT_ID>)
+	./infra/gcp/deploy.sh $(project)

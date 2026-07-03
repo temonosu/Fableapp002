@@ -62,6 +62,15 @@ make format   # 自動整形
 make migrate  # DB マイグレーション適用
 ```
 
+## デプロイ(Google Cloud Run)
+
+```bash
+make deploy project=<GCPプロジェクトID>   # 詳細は infra/README.md
+```
+
+SPA + API + シグナリングを Cloud Run 1サービスに同居させる最安構成
+(アイドル時 ¥0、個人利用は無料枠内)。設計は [docs/spec/deploy/](./docs/spec/deploy/) を参照。
+
 ## 開発フロー(spec 駆動)
 
 1. `docs/spec/_template/` をコピーして機能の仕様(要件 → 設計 → タスク)を書く
