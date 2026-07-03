@@ -70,6 +70,7 @@ export interface Settlement {
   kubikakeDoubled: boolean;
   gross: number; // 勝者の獲得(clip 前)
   transfer: number; // 実際に動いた文数(clip 後)
+  ooiriBonus: number; // 大入りのおひねり(場からの湧き出し。0 = 大入りなし)
 }
 
 export interface TableResult {
@@ -84,6 +85,8 @@ export interface TableState {
   roundNumber: number; // 1 始まり
   round: RoundState | null;
   result: TableResult | null;
+  /** 熱気ゲージ(roguelike-run 要件4)。100で大入り→リセット。局間で-20 */
+  heat: number;
 }
 
 export type Action =

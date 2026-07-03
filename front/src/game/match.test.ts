@@ -36,8 +36,9 @@ function makeTable(
   round: RoundState,
   chips: Record<PlayerId, number>,
   config: TableConfig = makeConfig(),
+  heat = 0,
 ): TableState {
-  return { config, chips, dealer: "A", roundNumber: 1, round, result: null };
+  return { config, chips, dealer: "A", roundNumber: 1, round, result: null, heat };
 }
 
 function settlementOf(events: GameEvent[]): Settlement {
@@ -337,6 +338,69 @@ describe("局の進行", () => {
     expect(result.state.roundNumber).toBe(2);
     expect(result.state.round?.hands.A).toHaveLength(8);
     expect(countAllCards(result.state)).toBe(48);
+  });
+});
+
+describe("熱気とおひねり", () => {
+  it("こいこいで+15、細工発動で+5", () => {
+    const koikoi = makeTable(
+      makeRound({
+        phase: "awaitDecision",
+        turn: "A",
+        hands: { A: [0, 4], B: [1] },
+        captured: { A: inoshikacho, B: [] },
+      }),
+      { A: 100, B: 100 },
+    );
+    const afterKoikoi = applyAction(koikoi, { type: "declareKoikoi", player: "A" });
+    expect(afterKoikoi.ok && afterKoikoi.state.heat).toBe(15);
+  });
+
+  it("熱気100以上で上がると大入り(場代×3が場から湧く)、ゲージはリセット", () => {
+    const state = makeTable(
+      makeRound({
+        phase: "awaitDecision",
+        turn: "A",
+        hands: { A: [0], B: [1] },
+        captured: { A: inoshikacho, B: [] },
+      }),
+      { A: 100, B: 100 },
+      makeConfig({ month: 2 }),
+      100,
+    );
+    const result = applyAction(state, { type: "declareShobu", player: "A" });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const s = settlementOf(result.events);
+    expect(s.ooiriBonus).toBe(30); // 場代10 × 3
+    expect(s.transfer).toBe(10); // 5文×レート2×倍率1
+    // 相手からの10文 + 場から30文 → チップ総量が30増える
+    expect(result.state.chips).toEqual({ A: 140, B: 90 });
+    expect(result.state.heat).toBe(0);
+  });
+
+  it("倍率3以上の上がりは+10×倍率、局をまたぐと-20", () => {
+    const state = makeTable(
+      makeRound({
+        phase: "awaitDecision",
+        turn: "A",
+        hands: { A: [0], B: [1] },
+        captured: { A: inoshikacho, B: [] },
+        multiplier: 3,
+      }),
+      { A: 100, B: 100 },
+      makeConfig({ month: 2 }),
+    );
+    const result = applyAction(state, { type: "declareShobu", player: "A" });
+    expect(result.ok && result.state.heat).toBe(30);
+    if (!result.ok) return;
+    const next = applyAction(result.state, { type: "nextRound", player: "A" });
+    expect(next.ok && next.state.heat).toBe(10);
+  });
+
+  it("首賭けの賭場戦は熱気30で始まる", () => {
+    const { state } = createTable(makeConfig({ entryFee: 5, kubikake: "A" }), { A: 3, B: 40 }, "A");
+    expect(state.heat).toBe(30);
   });
 });
 

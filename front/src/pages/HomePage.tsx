@@ -17,10 +17,16 @@ export function HomePage() {
       <h1 className="text-2xl font-bold">myapp</h1>
       <p className="mt-2">スマートフォン向け Web アプリのテンプレートです。</p>
       <Link
-        to="/match"
+        to="/run"
         className="mt-4 block rounded bg-rose-700 py-3 text-center font-bold text-white active:bg-rose-800"
       >
-        賭場へ(こいこい対AI戦)
+        旅打ちに出る(ラン)
+      </Link>
+      <Link
+        to="/match"
+        className="mt-3 block rounded border border-rose-700 py-3 text-center font-bold text-rose-700 active:bg-rose-50"
+      >
+        腕試し(単発対局)
       </Link>
       <section aria-label="バックエンド疎通確認" className="mt-6">
         <h2 className="text-lg font-semibold">API ステータス</h2>

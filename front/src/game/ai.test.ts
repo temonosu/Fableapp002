@@ -40,8 +40,10 @@ describe("AI 同士の通し対局(エンジンの総合検証)", () => {
   it("複数シードで不正な手なく進行し、チップ総量が保存される", () => {
     for (let seed = 1; seed <= 12; seed++) {
       const { state } = playOut(seed);
-      // 場代5文は場に消える。細工なしなので以降の総量は不変
-      expect(state.chips.A + state.chips.B).toBe(115);
+      // 場代5文は場に消える。細工なしなので総量の増加は大入り(場代×3=15文)単位のみ
+      const total = state.chips.A + state.chips.B;
+      expect(total).toBeGreaterThanOrEqual(115);
+      expect((total - 115) % 15).toBe(0);
       expect(state.chips.A).toBeGreaterThanOrEqual(0);
       expect(state.chips.B).toBeGreaterThanOrEqual(0);
       if (state.result !== null) {
