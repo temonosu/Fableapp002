@@ -40,7 +40,7 @@ export function createTable(
   dealer: PlayerId,
 ): { state: TableState; events: GameEvent[] } {
   const paid = { ...chips };
-  if (config.kubikake !== config.entrant) {
+  if (config.entrant !== null && config.kubikake !== config.entrant) {
     paid[config.entrant] = Math.max(0, paid[config.entrant] - config.entryFee);
   }
   const base: TableState = {
@@ -364,6 +364,7 @@ export function applyAction(state: TableState, action: Action): ApplyResult {
     case "retreat": {
       if (round.phase !== "roundOver") return fail("撤退は局と局の間でのみ可能");
       if (draft.result !== null) return fail("賭場戦は終了している");
+      if (draft.config.entrant === null) return fail("この賭場戦に撤退はない");
       if (action.player !== draft.config.entrant) return fail("撤退できるのは入場側のみ");
       endTable(draft, round, { kind: "retreat", winner: null }, events);
       return { ok: true, state: draft, events };

@@ -54,8 +54,8 @@ export interface TableConfig {
   seed: number;
   month: Month; // 旬
   rate: number; // 文/点
-  entryFee: number; // 場代(慣例: rate × 5)
-  entrant: PlayerId; // 入場側(場代を払い、撤退を選べる側)
+  entryFee: number; // 場代(慣例: rate × 5)。こいこい料・大入りの基準額でもある
+  entrant: PlayerId | null; // 入場側(場代を払い、撤退を選べる側)。null = 徴収なし・撤退不可(PvP)
   effects: Readonly<Partial<Record<CardId, EffectId>>>; // 細工(48枚中最大6枚)
   kubikake: PlayerId | null; // 首賭け中のプレイヤー
 }

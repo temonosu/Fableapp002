@@ -23,3 +23,20 @@ export async function apiGet<T>(path: string): Promise<T> {
   }
   return (await response.json()) as T;
 }
+
+export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
+  const response = await fetch(buildUrl(path), {
+    method: "POST",
+    headers: body !== undefined ? { "Content-Type": "application/json" } : {},
+    body: body !== undefined ? JSON.stringify(body) : null,
+  });
+  if (!response.ok) {
+    throw new ApiError(response.status, `POST ${path} failed: ${response.status}`);
+  }
+  return (await response.json()) as T;
+}
+
+/** WebSocket 用の URL(http(s) → ws(s) に読み替え) */
+export function buildWsUrl(path: string): string {
+  return buildUrl(path).replace(/^http/, "ws");
+}

@@ -1,35 +1,48 @@
 import { useMemo, useState } from "react";
 import { MONTH_FLOWERS, cardOf } from "../game/cards";
 import { EFFECTS } from "../game/effects";
-import { fieldMatches } from "../game/match";
-import type { Action, CardId, EffectId, GameEvent, Month, TableState } from "../game/types";
+import { fieldMatches, other } from "../game/match";
+import type {
+  Action,
+  CardId,
+  EffectId,
+  GameEvent,
+  Month,
+  PlayerId,
+  TableState,
+} from "../game/types";
 import { evaluateYaku } from "../game/yaku";
 
-// 対局の共通ビュー。MatchPage(単発対局)と RunPage(ラン中の賭場戦)で共用する
+// 対局の共通ビュー。MatchPage(単発)・RunPage(ラン)・PvpPage(P2P対戦)で共用する。
+// self でどちらのプレイヤー視点でも表示・操作できる
 
-export const PLAYER_NAME = { A: "あなた", B: "胴元" } as const;
+export const PLAYER_NAME: Record<PlayerId, string> = { A: "あなた", B: "胴元" };
 
 export function monthLabel(month: Month): string {
   return `${month}月・${MONTH_FLOWERS[month - 1] ?? ""}`;
 }
 
-export function describeEvents(state: TableState, events: GameEvent[]): string[] {
+export function describeEvents(
+  state: TableState,
+  events: GameEvent[],
+  names: Record<PlayerId, string> = PLAYER_NAME,
+): string[] {
   const lines: string[] = [];
   for (const e of events) {
     switch (e.type) {
       case "deal":
-        lines.push(`第${state.roundNumber}局 開始(先手: ${PLAYER_NAME[e.dealer]})`);
+        lines.push(`第${state.roundNumber}局 開始(先手: ${names[e.dealer]})`);
         break;
       case "yaku":
-        lines.push(`${PLAYER_NAME[e.player]}に役: ${e.names.join("・")}`);
+        lines.push(`${names[e.player]}に役: ${e.names.join("・")}`);
         break;
       case "koikoi":
-        lines.push(`${PLAYER_NAME[e.player]}「こいこい!」(倍率 ×${e.multiplier})`);
+        lines.push(`${names[e.player]}「こいこい!」(倍率 ×${e.multiplier})`);
         break;
       case "effect": {
         const chip = e.chipDelta !== 0 ? ` ${e.chipDelta > 0 ? "+" : ""}${e.chipDelta}文` : "";
         const mult = e.multiplierDelta !== 0 ? ` 倍率+${e.multiplierDelta}` : "";
-        lines.push(`細工「${EFFECTS[e.effect].name}」発動(${PLAYER_NAME[e.player]}${chip}${mult})`);
+        lines.push(`細工「${EFFECTS[e.effect].name}」発動(${names[e.player]}${chip}${mult})`);
         break;
       }
       case "roundEnd":
@@ -40,7 +53,7 @@ export function describeEvents(state: TableState, events: GameEvent[]): string[]
           const fee = s.koikoiFee > 0 ? ` + こいこい料${s.koikoiFee}文` : "";
           const ooiri = s.ooiriBonus > 0 ? ` + 大入り${s.ooiriBonus}文!` : "";
           lines.push(
-            `${PLAYER_NAME[s.winner]}の上がり! ${s.base}文 ×${s.multiplier}` +
+            `${names[s.winner]}の上がり! ${s.base}文 ×${s.multiplier}` +
               `${s.shunBonus > 0 ? ` + 旬${s.shunBonus}文` : ""}${fee} → ${s.transfer}文${ooiri}`,
           );
         }
@@ -49,7 +62,7 @@ export function describeEvents(state: TableState, events: GameEvent[]): string[]
         lines.push(
           e.result.kind === "retreat"
             ? "賭場から撤退した"
-            : `勝負あり! ${e.result.winner !== null ? PLAYER_NAME[e.result.winner] : ""}の総取り`,
+            : `勝負あり! ${e.result.winner !== null ? names[e.result.winner] : ""}の総取り`,
         );
         break;
       default:
@@ -126,16 +139,20 @@ function CapturedSummary({ table, player }: { table: TableState; player: "A" | "
 
 interface TableBoardProps {
   table: TableState;
-  onAction: (action: Action) => void; // 人間(A)の操作
+  onAction: (action: Action) => void; // self の操作
   log: string[];
+  self?: PlayerId; // 操作・手前表示するプレイヤー(既定: A)
+  opponentName?: string; // 相手の表示名(既定: 胴元)
 }
 
 /** 対局盤面(相手・場・手札・熱気・ログ・こいこい判断)。局間/終了の操作は呼び出し側が置く */
-export function TableBoard({ table, onAction, log }: TableBoardProps) {
+export function TableBoard({ table, onAction, log, self = "A", opponentName }: TableBoardProps) {
   const [selected, setSelected] = useState<CardId | null>(null);
   const round = table.round;
+  const opp = other(self);
+  const oppName = opponentName ?? "胴元";
 
-  const humanTurn = round !== null && round.turn === "A" && table.result === null;
+  const humanTurn = round !== null && round.turn === self && table.result === null;
 
   const playableTargets = useMemo(() => {
     if (round === null) return new Set<CardId>();
@@ -160,17 +177,17 @@ export function TableBoard({ table, onAction, log }: TableBoardProps) {
       setSelected(selected === card ? null : card); // 合わせ先を選んでもらう
       return;
     }
-    act({ type: "playCard", player: "A", card });
+    act({ type: "playCard", player: self, card });
   };
 
   const onTapField = (target: CardId) => {
     if (!humanTurn) return;
     if (round.phase === "awaitFlipTarget") {
-      act({ type: "chooseFlipTarget", player: "A", target });
+      act({ type: "chooseFlipTarget", player: self, target });
       return;
     }
     if (round.phase === "awaitPlay" && selected !== null && playableTargets.has(target)) {
-      act({ type: "playCard", player: "A", card: selected, target });
+      act({ type: "playCard", player: self, card: selected, target });
     }
   };
 
@@ -198,15 +215,15 @@ export function TableBoard({ table, onAction, log }: TableBoardProps) {
       {/* 相手 */}
       <section className="mt-2 rounded bg-neutral-100 p-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="font-semibold">{PLAYER_NAME.B}</span>
-          <span>{table.chips.B}文</span>
+          <span className="font-semibold">{oppName}</span>
+          <span>{table.chips[opp]}文</span>
         </div>
         <div className="mt-1 flex flex-wrap gap-1">
-          {round.hands.B.map((id) => (
+          {round.hands[opp].map((id) => (
             <div key={id} className="h-9 w-6 rounded border border-neutral-400 bg-neutral-600" />
           ))}
         </div>
-        <CapturedSummary table={table} player="B" />
+        <CapturedSummary table={table} player={opp} />
       </section>
 
       {/* 場 */}
@@ -237,19 +254,19 @@ export function TableBoard({ table, onAction, log }: TableBoardProps) {
       <section className="mt-2 rounded bg-neutral-100 p-2">
         <div className="flex items-center justify-between text-sm">
           <span className="font-semibold">
-            {PLAYER_NAME.A}
+            あなた
             {humanTurn && round.phase === "awaitPlay" && (
               <span className="ml-2 text-xs text-emerald-700">あなたの番</span>
             )}
           </span>
-          <span>{table.chips.A}文</span>
+          <span>{table.chips[self]}文</span>
         </div>
         <div className="mt-1 flex flex-wrap gap-1.5">
-          {round.hands.A.map((id) => (
+          {round.hands[self].map((id) => (
             <CardTile key={id} id={id} table={table} selected={selected === id} onTap={onTapHand} />
           ))}
         </div>
-        <CapturedSummary table={table} player="A" />
+        <CapturedSummary table={table} player={self} />
       </section>
 
       {/* ログ */}
@@ -264,21 +281,21 @@ export function TableBoard({ table, onAction, log }: TableBoardProps) {
         <div className="fixed inset-x-0 bottom-0 border-t border-neutral-300 bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <p className="text-sm font-semibold">
             役ができた:{" "}
-            {evaluateYaku(round.captured.A)
+            {evaluateYaku(round.captured[self])
               .map((y) => `${y.name}${y.points}文`)
               .join("・")}
           </p>
           <div className="mt-3 flex gap-3">
             <button
               type="button"
-              onClick={() => act({ type: "declareKoikoi", player: "A" })}
+              onClick={() => act({ type: "declareKoikoi", player: self })}
               className="flex-1 rounded bg-rose-600 py-3 font-bold text-white active:bg-rose-700"
             >
               こいこい(倍率×{round.multiplier + 1})
             </button>
             <button
               type="button"
-              onClick={() => act({ type: "declareShobu", player: "A" })}
+              onClick={() => act({ type: "declareShobu", player: self })}
               className="flex-1 rounded bg-emerald-600 py-3 font-bold text-white active:bg-emerald-700"
             >
               勝負

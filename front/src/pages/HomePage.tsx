@@ -28,6 +28,12 @@ export function HomePage() {
       >
         腕試し(単発対局)
       </Link>
+      <Link
+        to="/pvp"
+        className="mt-3 block rounded border border-neutral-700 py-3 text-center font-bold text-neutral-800 active:bg-neutral-100"
+      >
+        P2P 対戦(ルームコードで友達と)
+      </Link>
       <section aria-label="バックエンド疎通確認" className="mt-6">
         <h2 className="text-lg font-semibold">API ステータス</h2>
         {health && (
