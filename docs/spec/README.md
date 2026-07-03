@@ -34,3 +34,4 @@ docs/spec/
 | [game-core](./game-core/) | 実装済み(こいこい対局エンジン・細工フック・対AI戦) |
 | [roguelike-run](./roguelike-run/) | 実装済み(暦すごろく・市場/レリック・熱気・首賭け) |
 | [p2p-match](./p2p-match/) | 対戦は実装済み(WebRTC + シグナリング)。観戦・観戦者ベット(要件4・5)は M4 |
+| [deploy](./deploy/) | 実装済み(Cloud Run 単一サービスの最安構成。`make deploy`) |
