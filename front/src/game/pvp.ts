@@ -24,8 +24,7 @@ export interface PvpState {
 export type PvpAction = { type: "table"; action: Action } | { type: "nextGame" };
 
 export type PvpApplyResult =
-  | { ok: true; state: PvpState; events: GameEvent[] }
-  | { ok: false; reason: string };
+  { ok: true; state: PvpState; events: GameEvent[] } | { ok: false; reason: string };
 
 function buildTable(
   matchSeed: number,

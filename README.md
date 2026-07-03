@@ -38,7 +38,7 @@ Docker を使わない場合は `make setup` 後、`cd front && npm run dev`(Nod
 |----------------|------|------|
 | M1: こいこい対局エンジン + 対AI戦 | ✅ 実装済み | [game-core](./docs/spec/game-core/) |
 | M2: ラン構造(すごろく・市場・レリック・熱気) | ✅ 実装済み | [roguelike-run](./docs/spec/roguelike-run/) |
-| M3: P2P 対戦(WebRTC + シグナリング) | 要件のみ | [p2p-match](./docs/spec/p2p-match/) |
+| M3: P2P 対戦(WebRTC + シグナリング) | ✅ 実装済み | [p2p-match](./docs/spec/p2p-match/) |
 | M4: 観戦(勝率メーター・観戦者ベット)・メタ進行 | 要件のみ | 同上 |
 
 ## リポジトリ構成

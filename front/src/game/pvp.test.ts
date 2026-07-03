@@ -58,10 +58,16 @@ describe("PvP 試合の構成", () => {
   });
 
   it("5局終了時は残文勝負(同数は引き分け)", () => {
-    const last = { ...withRoundOver(createPvpMatch(3), { A: 40, B: 20 }), gameIndex: PVP_MAX_GAMES };
+    const last = {
+      ...withRoundOver(createPvpMatch(3), { A: 40, B: 20 }),
+      gameIndex: PVP_MAX_GAMES,
+    };
     const result = apply(last, { type: "nextGame" });
     expect(result.result).toEqual({ kind: "count", winner: "A" });
-    const tied = { ...withRoundOver(createPvpMatch(3), { A: 30, B: 30 }), gameIndex: PVP_MAX_GAMES };
+    const tied = {
+      ...withRoundOver(createPvpMatch(3), { A: 30, B: 30 }),
+      gameIndex: PVP_MAX_GAMES,
+    };
     expect(apply(tied, { type: "nextGame" }).result).toEqual({ kind: "count", winner: null });
   });
 
